@@ -1,7 +1,8 @@
-import User  from '../models/User';
-import { makeExecutableSchema } from 'graphql-tools';
 
-const users: Array<User> = [{
+import { makeExecutableSchema } from 'graphql-tools';
+import { UserAtribuites } from '../models/UserAtribuites';
+
+const users: Array<UserAtribuites> = [{
   id: 1,
   name: 'Jose',
   email: 'jose@gmail.com.br',
@@ -34,7 +35,6 @@ const typeDefs = `
 const resolvers = {
   Query: {
     allUsers: () => users,
-
   },
   Mutation: {
     createUser: (parent: any, args: any) => {
@@ -42,7 +42,7 @@ const resolvers = {
       const newUser = { ...args, id: users.length + 1 };
       users.push(newUser);
       return users;
-    }
+    },
   },
 };
 
