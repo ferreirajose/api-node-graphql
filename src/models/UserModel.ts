@@ -16,7 +16,7 @@ export interface UserModel extends BaseModeInterface, Sequelize.Model<UserInstan
  */
 export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes): UserModel => {
     // Criando schema para geração da tabela na BASE
-  const User: UserModel = sequelize.define<UserInstance, UserAtribuites>('User', {
+  const USER: UserModel = sequelize.define<UserInstance, UserAtribuites>('User', {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -59,12 +59,12 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
     },
   });
 
-  User.associate = (models: ModelsInterface): void => {};
+  USER.associate = (models: ModelsInterface): void => {};
 
-  User.prototype.isPassaword = (encodendPassaword: string, passaword: string) => {
+  USER.prototype.isPassaword = (encodendPassaword: string, passaword: string) => {
     return compareSync(passaword, encodendPassaword);
   };
 
-  return User;
+  return USER;
 
 };
