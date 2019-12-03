@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { BaseModeInterface } from '../interfaces/BaseModeInterface';
 
 import { ModelsInterface } from '../interfaces/ModelInterfaces';
-import { PostAtributesModel } from './PostAtributesModel';
+import { PostAtributesModel } from '../interfaces/PostAtributesModel';
 
 export interface PostInstance extends Sequelize.Instance<PostAtributesModel>{}
 

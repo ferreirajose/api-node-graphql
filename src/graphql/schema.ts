@@ -1,6 +1,6 @@
 
 import { makeExecutableSchema } from 'graphql-tools';
-import { UserAtribuites } from '../models/UserAtribuites';
+import { UserAtribuites } from '../interfaces/UserAtribuites';
 
 const users: Array<UserAtribuites> = [{
   id: 1,

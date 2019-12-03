@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { genSaltSync, hashSync, compareSync } from 'bcryptjs';
 
 import { BaseModeInterface } from '../interfaces/BaseModeInterface';
-import { UserAtribuites } from './UserAtribuites';
+import { UserAtribuites } from '../interfaces/UserAtribuites';
 import { ModelsInterface } from '../interfaces/ModelInterfaces';
 
 export interface UserInstance extends Sequelize.Instance<UserAtribuites>, UserAtribuites {
@@ -14,7 +14,7 @@ export interface UserModel extends BaseModeInterface, Sequelize.Model<UserInstan
 /**
  * Representa a instancia do banco de dados
  */
-export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes): UserModel => {
+export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes): UserModel => {  
     // Criando schema para geração da tabela na BASE
   const USER: UserModel = sequelize.define<UserInstance, UserAtribuites>('User', {
     id: {

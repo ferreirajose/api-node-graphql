@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 
-import { CommentAtributesModel } from './CommentAtributesModel';
+import { CommentAtributesModel } from '../interfaces/CommentAtributesModel';
 import { BaseModeInterface } from '../interfaces/BaseModeInterface';
 import { ModelsInterface } from '../interfaces/ModelInterfaces';
 
