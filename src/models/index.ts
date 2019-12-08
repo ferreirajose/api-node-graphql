@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as Sequelize from 'sequelize';
+import * as color from 'colors';
 
 import { DbConnectionInterface } from '../interfaces/DbConnectionInterface';
 import { ConfigDbInterface } from '../interfaces/ConfigDBInterface';
@@ -16,6 +17,10 @@ let db: any = null;
 // criando uma unica instancia para conectar ao banco de dados
 if (!db) {
     db = {};
+    
+    // esse é para desativar operadores do Sequelize, pois gerar um warning no terminal
+    const operatorAliases = false;
+    config = Object.assign({operatorAliases}, config);
 
     const sequelize: Sequelize.Sequelize = new Sequelize(
         config.database,
@@ -28,7 +33,8 @@ if (!db) {
     fs.readdirSync(__dirname).filter((file: string) => {
         return (file.indexOf('.') !== 0) && (file !== baseName) && (file.slice(-3) === '.js');
     }).forEach((file: string) => {
-        console.log(path.join(__dirname, file), 'as');
+        
+        console.log(color.blue(path.join(__dirname, file)), 'readdirSync');
         const model: any = sequelize.import(path.join(__dirname, file));
 
         

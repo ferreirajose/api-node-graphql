@@ -1,4 +1,5 @@
 import * as http from 'http';
+import * as color from 'colors';
 
 import app from './app';
 import db from './models';
@@ -12,5 +13,11 @@ db.sequelize.sync().then(() => {
     server.on('error', onError(server));
     server.on('listening', onListening(server));
 }).catch(erro => {
-    console.log(erro);
+    console.log(color.red(erro), 'sequelize sync');
 })
+
+
+/** 
+ * TypeError: Data must be a string or a buffer
+ * esse erro estava sendo causado por causa da senha para acessar o DB, pois deveria ser um String
+ * */ 
