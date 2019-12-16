@@ -46,7 +46,7 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
       allowNull: true,
       defaultValue: null,
     },
-  },                                                                     {
+  },{
       /**
        * definindo o nome da tabela, por padão O sequelize pegaria o valor 'User' que foi informado no Método sequelize.define('User'
        */
@@ -56,6 +56,12 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
         const salt = genSaltSync();
         user.passaword = hashSync(user.passaword, salt);
       },
+      beforeUpdate:(user: UserInstance, options: Sequelize.CreateOptions): void => {
+        if (user.changed('password')) {
+          const salt = genSaltSync();
+          user.passaword = hashSync(user.passaword, salt);
+        }
+      }
     },
   });
 
