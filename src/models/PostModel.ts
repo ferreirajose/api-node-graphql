@@ -4,13 +4,13 @@ import { BaseModeInterface } from '../interfaces/BaseModeInterface';
 import { ModelsInterface } from '../interfaces/ModelInterfaces';
 import { PostAtributesModel } from '../interfaces/PostAtributesModel';
 
-export interface PostInstance extends Sequelize.Instance<PostAtributesModel>{}
+export interface PostInstance extends Sequelize.Instance<PostAtributesModel>, PostAtributesModel{}
 
-export interface PostModel extends BaseModeInterface, Sequelize.Model<PostModel, PostAtributesModel>{}
+export interface PostModel extends BaseModeInterface, Sequelize.Model<PostInstance, PostAtributesModel>{}
 
 export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes): PostModel => {
 
-  const POST:PostModel = sequelize.define('Post', {
+  const POST: PostModel = sequelize.define<PostInstance, PostAtributesModel>('Post', {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,

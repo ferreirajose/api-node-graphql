@@ -4,13 +4,13 @@ import { CommentAtributesModel } from '../interfaces/CommentAtributesModel';
 import { BaseModeInterface } from '../interfaces/BaseModeInterface';
 import { ModelsInterface } from '../interfaces/ModelInterfaces';
 
-export interface CommentInstance extends Sequelize.Instance<CommentAtributesModel> {}
+export interface CommentInstance extends Sequelize.Instance<CommentAtributesModel>, CommentAtributesModel{}
 
-export interface CommentModel extends BaseModeInterface, Sequelize.Model<CommentInstance, CommentAtributesModel> {}
+export interface CommentModel extends BaseModeInterface, Sequelize.Model<CommentInstance, CommentAtributesModel>{}
 
 export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes): CommentModel => {
 
-  const COMMENT: CommentModel = sequelize.define('Comment', {
+  const COMMENT: CommentModel = sequelize.define<CommentInstance, CommentAtributesModel>('Comment', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,

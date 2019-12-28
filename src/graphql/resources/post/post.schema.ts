@@ -7,7 +7,7 @@ const postTypes = `
         createdAt: String!
         updated: String!
         author: User!
-        comments: [ Comment! ]!
+        comments(first: Int, offset: Int): [ Comment! ]!
     }
 
     input PostInput {
@@ -26,7 +26,7 @@ const postQueries = `
 const postMutations = `
     createPost(input: PostInput!): Post
     updatePost(id: ID!, input: PostInput!): Post
-    deletPost(id: ID!): Boolean
+    deletePost(id: ID!): Boolean
 `;
 
 export {
