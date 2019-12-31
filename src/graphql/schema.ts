@@ -1,7 +1,6 @@
 import { makeExecutableSchema  } from 'graphql-tools';
 
 import { merge } from 'lodash';
-import * as color from 'colors';
 
 import { Query } from './query';
 import { Mutation } from './mutation';
@@ -14,20 +13,11 @@ import { commentResolvers } from './resources/comment/comment.resolvers';
 import { postResolvers } from './resources/post/post.resolvers';
 import { userResolvers } from './resources/users/user.resolvers';
 
-
-const resolvers1 = {
-    ...commentResolvers,
-    ...postResolvers,
-    ...userResolvers
-}
-// console.log(resolvers1, 'rest');
-
-// const resolvers = merge(
-//     commentResolvers,
-//     userResolvers,
-//     postResolvers
-// )
-
+const resolvers = merge(
+    commentResolvers,
+    userResolvers,
+    postResolvers
+);
 
 const SchemaDefinition = `
     type Schema {
@@ -46,5 +36,5 @@ export default makeExecutableSchema({
         postTypes,
         commentTypes
     ],
-    resolvers1
+    resolvers
 });

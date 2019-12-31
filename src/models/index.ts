@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as Sequelize from 'sequelize';
-import * as color from 'colors';
+// import * as color from 'colors';
 
 import { DbConnectionInterface } from '../interfaces/DbConnectionInterface';
 import { ConfigDbInterface } from '../interfaces/ConfigDBInterface';
@@ -34,9 +34,7 @@ if (!db) {
         return (file.indexOf('.') !== 0) && (file !== baseName) && (file.slice(-3) === '.js');
     }).forEach((file: string) => {
         
-        console.log(color.blue(path.join(__dirname, file)), 'readdirSync');
         const model: any = sequelize.import(path.join(__dirname, file));
-
         
         db[model['name']] = model;
     });

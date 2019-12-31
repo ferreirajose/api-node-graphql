@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "gulp": "node_modules/.bin/gulp",
     "start": "npm run watch",
-    "server": "nodemon dist/index",
+    "server": "nodemon --delay 5 dist/index",
     "watch": "tsc -w",
     "clear": "rm -rf dist"
   },
@@ -20,6 +21,9 @@
     "@types/lodash": "4.14.78",
     "@types/node": "8.0.34",
     "@types/sequelize": "4.0.76",
+    "gulp": "3.9.1",
+    "gulp-clean": "0.3.2",
+    "gulp-typescript": "3.2.2",
     "nodemon": "1.12.0",
     "sequelize-cli": "^5.5.1",
     "tslint": "^5.20.1",
