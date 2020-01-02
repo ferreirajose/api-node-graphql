@@ -23,8 +23,8 @@ export const userResolvers = {
         /**
          * Retorna todos os usuarios
          */
-        users: (user: UserInstance, { first = 10, offest = 10}: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
-            return db.User.findAll({
+        users: (user: UserInstance, { first = 10, offest = 10}: GenericInterface, context: any, info: GraphQLResolveInfo) => {
+            return context.db.User.findAll({
                     limit: first,
                     offset: offest
                 }

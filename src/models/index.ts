@@ -6,7 +6,6 @@ import * as Sequelize from 'sequelize';
 import { DbConnectionInterface } from '../interfaces/DbConnectionInterface';
 import { ConfigDbInterface } from '../interfaces/ConfigDBInterface';
 
-
 const baseName: string = path.basename(module.filename); // retorna o path completo do arquivo
 const env: string = process.env.NODE_ENV || 'development';
 

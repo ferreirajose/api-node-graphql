@@ -1,12 +1,17 @@
 const gulp = require('gulp');
 const clean = require('gulp-clean');
 const ts = require('gulp-typescript');
+
 const tsProject = ts.createProject('tsconfig.json');
 
 gulp.task('scripts', ['static'], () => {
-    return tsProject.src()
-        .pipe(tsProject())
-        .js.pipe(gulp.dest('dist'));
+
+    const tsResult = tsProject.src()
+        .pipe(tsProject());
+
+    return tsResult.js
+        .pipe(gulp.dest('dist'));
+
 });
 
 gulp.task('static', ['clean'], () => {
@@ -18,13 +23,13 @@ gulp.task('static', ['clean'], () => {
 gulp.task('clean', () => {
     return gulp
         .src('dist')
-        .pipe(clean())
-});
-
-gulp.task('watch', ['scripts'], () => {
-    return gulp.watch(['src/**/*.ts', 'src/**/*.json'], ['build']);
+        .pipe(clean());
 });
 
 gulp.task('build', ['scripts']);
+
+gulp.task('watch', ['build'], () => {
+    return gulp.watch(['src/**/*.ts', 'src/**/*.json'], ['build']);
+});
 
 gulp.task('default', ['watch']);

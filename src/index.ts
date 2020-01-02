@@ -6,14 +6,17 @@ import db from './models';
 import { normalizePort, onError, onListening } from './utils/utils';
 
 const server = http.createServer(app);
-const port  = normalizePort(process.env.port || 3000);
+export const port = normalizePort(process.env.port || 4000); // exportar essa constante
 
 db.sequelize.sync().then(() => {  
     server.listen(port);
     server.on('error', onError(server));
     server.on('listening', onListening(server));
 }).catch(erro => {
-    console.log(color.red(erro), 'sequelize sync');
+    console.group("Error Name");
+    console.log("Sequelize sync");
+    console.log(color.red(erro));
+    console.groupEnd();
 })
 
 

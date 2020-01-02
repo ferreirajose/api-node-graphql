@@ -6,5 +6,7 @@ export interface GenericInterface {
     args?: any;
     first: number;
     offest: number;
+    email: string,
+    password: string,
     db?: DbConnectionInterface
-};
+}
