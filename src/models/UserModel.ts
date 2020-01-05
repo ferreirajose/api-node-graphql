@@ -6,7 +6,7 @@ import { UserAtribuites } from '../interfaces/UserAtribuites';
 import { ModelsInterface } from '../interfaces/ModelInterfaces';
 
 export interface UserInstance extends Sequelize.Instance<UserAtribuites>, UserAtribuites {
-  isPassaword(encodendPassaword: string, passaword: string): boolean;
+  isPassword(encodendPassword: string, password: string): boolean;
 }
 
 export interface UserModel extends BaseModeInterface, Sequelize.Model<UserInstance, UserAtribuites> {}
@@ -32,7 +32,7 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
       allowNull: false,
       unique: true,
     },
-    passaword: {
+    password: {
       type: DataTypes.STRING(240),
       allowNull: false,
       validate: {
@@ -54,12 +54,12 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
     hooks: {
       beforeCreate:(user: UserInstance, options: Sequelize.CreateOptions): void => {
         const salt = genSaltSync();
-        user.passaword = hashSync(user.passaword, salt);
+        user.password = hashSync(user.password, salt);
       },
       beforeUpdate:(user: UserInstance, options: Sequelize.CreateOptions): void => {
         if (user.changed('password')) {
           const salt = genSaltSync();
-          user.passaword = hashSync(user.passaword, salt);
+          user.password = hashSync(user.password, salt);
         }
       }
     },
@@ -67,8 +67,8 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
 
   USER.associate = (models: ModelsInterface): void => {};
 
-  USER.prototype.isPassaword = (encodendPassaword: string, passaword: string) => {
-    return compareSync(passaword, encodendPassaword);
+  USER.prototype.isPassword = (encodendPassword: string, password: string) => {
+    return compareSync(password, encodendPassword);
   };
 
   return USER;

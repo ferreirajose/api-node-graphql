@@ -3,9 +3,9 @@ export interface UserAtribuites {
   name?: string;
   email?: string;
   /**
-   * tive que add para any pois estava gerando erro de tipagem no metodo hashSync(user.passaword)
+   * tive que add para any pois estava gerando erro de tipagem no metodo hashSync(user.password)
    */
-  passaword?: any;
+  password?: any;
   photo?: string;
   createdAt?: string;
   updatedAt?: string;

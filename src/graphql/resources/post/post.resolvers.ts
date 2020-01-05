@@ -1,6 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { Transaction } from 'sequelize';
 
+import db from '../../../models/index';
+
 import { handlerError } from '../../../utils/utils';
 
 import { DbConnectionInterface } from '../../../interfaces/DbConnectionInterface';
@@ -9,10 +11,10 @@ import { GenericInterface } from '../../../interfaces/GenericInterface';
 
 export const postResolvers = {
     Post: {
-        author: (post: PostInstance, args: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        author: (post: PostInstance, args: GenericInterface, info: GraphQLResolveInfo) => {
             return db.User.findById(post.get('author'));
         },
-        comments: (post: PostInstance, { first = 10, offset = 0}, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        comments: (post: PostInstance, { first = 10, offset = 0}, info: GraphQLResolveInfo) => {
             return db.Comment.findAll({
                 where: { post: post.get('id')},
                 limit: first,
@@ -21,13 +23,13 @@ export const postResolvers = {
         }
     },
     Query: {
-        posts: (post: PostInstance, { first = 10, offset = 0 }, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        posts: (post: PostInstance, { first = 10, offset = 0 }, info: GraphQLResolveInfo) => {
             return db.Post.findAll({
                 limit: first,
                 offset: offset
             }).catch(handlerError);
         },
-        post: (post: PostInstance, {id}: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        post: (post: PostInstance, {id}: GenericInterface, info: GraphQLResolveInfo) => {
             return db.Post.findById(Number(id))
                 .then((post: PostInstance | null) => {
                     if (!post) {
@@ -39,12 +41,12 @@ export const postResolvers = {
         }
     },
     Mutation: {
-        createPost: (post: PostInstance, { input }: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        createPost: (post: PostInstance, { input }: GenericInterface, info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Post.create(input, { transaction: t})
             }).catch(handlerError);
         }, 
-        updatePost: (post: PostInstance, {id, input}: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        updatePost: (post: PostInstance, {id, input}: GenericInterface, info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Post.findById(Number(id))
                     .then((post: PostInstance | null) => {
@@ -56,7 +58,7 @@ export const postResolvers = {
                 );
             }).catch(handlerError);
         },
-        deletePost: (post: PostInstance, {id}: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        deletePost: (post: PostInstance, {id}: GenericInterface, info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Post.findById(Number(id))
                     .then((post: PostInstance | null) => {

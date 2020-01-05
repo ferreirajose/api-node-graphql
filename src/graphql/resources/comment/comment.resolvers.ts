@@ -1,6 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { Transaction } from 'sequelize';
 
+import db from '../../../models/index';
 import { handlerError } from '../../../utils/utils';
 
 import { CommentInstance } from '../../../models/CommentModel';
@@ -9,15 +10,15 @@ import { GenericInterface } from '../../../interfaces/GenericInterface';
 
 export const commentResolvers = {
     Comment: {
-        user: (comment: CommentInstance, args: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        user: (comment: CommentInstance, args: GenericInterface, info: GraphQLResolveInfo) => {
             return db.User.findById(comment.get('user')).catch(handlerError);
         },
-        post: (comment: CommentInstance, args: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        post: (comment: CommentInstance, args: GenericInterface, info: GraphQLResolveInfo) => {
             return db.Post.findById(comment.get('post')).catch(handlerError);
         }
     },
     Query: {
-        commentsByPost: (comment: CommentInstance, {id, first = 10, offest = 0}: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        commentsByPost: (comment: CommentInstance, {id, first = 10, offest = 0}: GenericInterface, info: GraphQLResolveInfo) => {
             return db.Comment.findAll({
                 where: { post: id},
                 limit: first,
@@ -26,12 +27,12 @@ export const commentResolvers = {
         }
     },
     Mutation: {
-        createComment: (comment: CommentInstance, {input}: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        createComment: (comment: CommentInstance, {input}: GenericInterface, info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment.create(input, {transaction: t})
             }).catch(handlerError);
         },
-        updateComment: (comment: CommentInstance, {id, input}: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        updateComment: (comment: CommentInstance, {id, input}: GenericInterface, info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment.findById(Number(id))
                     .then((comment: CommentInstance | null) => {
@@ -44,7 +45,7 @@ export const commentResolvers = {
                 );
             }).catch(handlerError);
         },
-        deleteComment: (comment: CommentInstance, {id, input}: GenericInterface, {db}: {db: DbConnectionInterface}, info: GraphQLResolveInfo) => {
+        deleteComment: (comment: CommentInstance, {id, input}: GenericInterface, info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment.findById(Number(id))
                     .then((comment: CommentInstance | null) => {

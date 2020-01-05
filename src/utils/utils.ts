@@ -10,11 +10,10 @@ export const normalizePort = (val: number | string): number | string | boolean =
 
 export const onError = (server: Server) => {
   return (error: NodeJS.ErrnoException): void => {
-     //const port: number | string = server.address().port;
-    // const { port } = server.address() as AddressInfo; 
-
+    
     if (error.syscall !== 'listen') throw error;
     const bind = (typeof port === 'string') ? `pipe ${port}` : `port ${port}`;
+    
     switch (error.code) {
       case 'EACCES':
         console.error(`${bind} requires elevated privileges`);
@@ -41,6 +40,12 @@ export const onListening = (server: Server) => {
 export const handlerError = (erro: Error) => {
   let errorMensagem = `${erro.name}: ${erro.message}`;
   return Promise.reject(new Error(errorMensagem))
+}
+
+export const throwErro = (condition: boolean, msn: string) => {
+  if (condition) {
+    throw new Error(msn);
+  }
 }
 
 export const JWT_SECRET = process.env.JWT_SECRET || '';
