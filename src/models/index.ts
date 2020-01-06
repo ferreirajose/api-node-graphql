@@ -17,8 +17,10 @@ let db: any = null;
 if (!db) {
     db = {};
     
-    // esse é para desativar operadores do Sequelize, pois gerar um warning no terminal
-    const operatorAliases = false;
+    const operatorAliases = {
+        $in: Sequelize.Op.in // Permite fazer consultas mais otimizadas
+    };
+
     config = Object.assign({operatorAliases}, config);
 
     const sequelize: Sequelize.Sequelize = new Sequelize(
