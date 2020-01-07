@@ -17,10 +17,14 @@ import { DataLoadersInterface } from './../../../interfaces/DataLoadersInterface
 
 export const postResolvers = {
     Post: {
-        author: (post: PostInstance, args: GenericInterface, {db1, dataloaders: {userLoader}}: {db1: DbConnectionInterface, dataloaders: DataLoadersInterface}, _info: GraphQLResolveInfo) => {
-            return userLoader.load(post.get('author')).catch(handlerError);
+        author: (post: PostInstance, args: GenericInterface, {db1, dataloaders: {userLoader}}: {db1: DbConnectionInterface, dataloaders: DataLoadersInterface}, info: GraphQLResolveInfo) => {
+            return userLoader
+                .load({
+                    key: post.get('author'),
+                    info
+                }).catch(handlerError);
         },
-        comments: (post: PostInstance, { first = 10, offset = 0}, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {0
+        comments: (post: PostInstance, { first = 10, offset = 0}, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
             return db.Comment.findAll({
                 where: { post: post.get('id')},
                 limit: first,

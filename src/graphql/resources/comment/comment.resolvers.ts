@@ -14,10 +14,18 @@ import { GenericInterface } from '../../../interfaces/GenericInterface';
 export const commentResolvers = {
     Comment: {
         user: (comment: CommentInstance, args: GenericInterface, {db1, dataloaders: {userLoader}}: {db1: DbConnectionInterface, dataloaders: DataLoadersInterface}, info: GraphQLResolveInfo) => {
-            return userLoader.load(comment.get('user')).catch(handlerError);
+            return userLoader
+                .load({
+                    key: comment.get('user'),
+                    info
+                }).catch(handlerError);
         },
         post: (comment: CommentInstance, args: GenericInterface, {db1, dataloaders: {postLoader}}: {db1: DbConnectionInterface, dataloaders: DataLoadersInterface}, info: GraphQLResolveInfo) => {
-            return postLoader.load(comment.get('post')).catch(handlerError);
+            return postLoader
+                .load({
+                    key: comment.get('post'),
+                    info
+                }).catch(handlerError);
         }
     },
     Query: {
