@@ -7,6 +7,6 @@ export interface GenericInterface {
     input?: any;
     args?: any;
     first: number;
-    offest: number;
+    offset: number;
     db?: DbConnectionInterface
 }

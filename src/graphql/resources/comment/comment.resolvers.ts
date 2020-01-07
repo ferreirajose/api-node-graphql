@@ -1,3 +1,6 @@
+import { RequestedFields } from './../../ast/RequestFields';
+import { throwErro } from './../../../utils/utils';
+import { DataLoadersInterface } from './../../../interfaces/DataLoadersInterface';
 import { GraphQLResolveInfo } from 'graphql';
 import { Transaction } from 'sequelize';
 
@@ -10,19 +13,20 @@ import { GenericInterface } from '../../../interfaces/GenericInterface';
 
 export const commentResolvers = {
     Comment: {
-        user: (comment: CommentInstance, args: GenericInterface, info: GraphQLResolveInfo) => {
-            return db.User.findById(comment.get('user')).catch(handlerError);
+        user: (comment: CommentInstance, args: GenericInterface, {db1, dataloaders: {userLoader}}: {db1: DbConnectionInterface, dataloaders: DataLoadersInterface}, info: GraphQLResolveInfo) => {
+            return userLoader.load(comment.get('user')).catch(handlerError);
         },
-        post: (comment: CommentInstance, args: GenericInterface, info: GraphQLResolveInfo) => {
-            return db.Post.findById(comment.get('post')).catch(handlerError);
+        post: (comment: CommentInstance, args: GenericInterface, {db1, dataloaders: {postLoader}}: {db1: DbConnectionInterface, dataloaders: DataLoadersInterface}, info: GraphQLResolveInfo) => {
+            return postLoader.load(comment.get('post')).catch(handlerError);
         }
     },
     Query: {
-        commentsByPost: (comment: CommentInstance, {id, first = 10, offest = 0}: GenericInterface, info: GraphQLResolveInfo) => {
+        commentsByPost: (comment: CommentInstance, {id, first = 10, offset = 0}: GenericInterface, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
             return db.Comment.findAll({
                 where: { post: id},
                 limit: first,
-                offset: offest
+                offset: offset,
+                attributes: requestedFields.getFields(info)
             }).catch(handlerError);
         }
     },
@@ -35,11 +39,8 @@ export const commentResolvers = {
         updateComment: (comment: CommentInstance, {id, input}: GenericInterface, info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment.findById(Number(id))
-                    .then((comment: CommentInstance | null) => {
-                        if (!comment) {
-                            throw new Error(`Comment with id ${id} Not Foud`);
-                        }
-
+                    .then((comment: CommentInstance | any) => {
+                        throwErro(!comment, `Comment with: ${id} Not Found`);
                         return comment.update(input, {transaction: t});
                     }
                 );
@@ -48,11 +49,8 @@ export const commentResolvers = {
         deleteComment: (comment: CommentInstance, {id, input}: GenericInterface, info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.Comment.findById(Number(id))
-                    .then((comment: CommentInstance | null) => {
-                        if (!comment) {
-                            throw new Error(`Comment with id ${id} Not Foud`);
-                        }
-
+                    .then((comment: CommentInstance | any) => {
+                        throwErro(!comment, `Comment with: ${id} Not Found`);
                         return comment.destroy({transaction: t}).then((comment: CommentInstance | any) => !!comment);
                     }
                 );

@@ -19,7 +19,7 @@ const postTypes = `
 `;
 
 const postQueries = `
-    posts(first: Int, offest: Int): [ Post!]!
+    posts(first: Int, offset: Int): [ Post!]!
     post(id: ID!): Post
 `;
 
