@@ -35,8 +35,7 @@ export const userResolvers = {
             return db.User.findAll({
                     limit: first,
                     offset: offset,
-                    attributes: requestedFields.
-                    (info, {keep: ['id'], exclude: ['post']})
+                    attributes: requestedFields.getFields(info, {keep: ['id'], exclude: ['post']})
                 }
             ).catch(handlerError);
         }),
