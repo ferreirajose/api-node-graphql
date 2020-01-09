@@ -8,7 +8,8 @@
     "start": "npm run watch",
     "server": "cross-env NODE_ENV=development JWT_SECRET=iron_man nodemon --delay 5 dist/index",
     "watch": "tsc -w",
-    "clear": "rm -rf dist"
+    "clear": "rm -rf dist",
+    "test": "cross-env NODE_ENV=test JWT_SECRET=jwt_test mocha"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +35,7 @@
     "mocha": "4.0.1",
     "nodemon": "1.12.0",
     "sequelize-cli": "^5.5.1",
+    "ts-node": "3.3.0",
     "tslint": "^5.20.1",
     "typescript": "2.5.3"
   },
@@ -48,7 +50,7 @@
     "graphql-fields": "1.0.2",
     "graphql-tools": "2.3.0",
     "jsonwebtoken": "8.1.0",
-    "lodash": "4.17.4",
+    "lodash": "^4.17.15",
     "mysql2": "1.4.2",
     "sequelize": "4.13.10",
     "tslint-config-airbnb": "^5.11.2"
