@@ -13,7 +13,8 @@
     "database": "graphql_blog_test",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "operatorsAliases": false
+    "operatorsAliases": false,
+    "log": false
   },
   "production": {
     "username": "root",

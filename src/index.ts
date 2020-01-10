@@ -13,10 +13,8 @@ db.sequelize.sync().then(() => {
     server.on('error', onError(server));
     server.on('listening', onListening(server));
 }).catch(erro => {
-    console.group("Error Name");
     console.log("Sequelize sync");
     console.log(color.red(erro));
-    console.groupEnd();
 })
 
 

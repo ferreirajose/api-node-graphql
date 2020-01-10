@@ -1,3 +1,4 @@
+import { AuthUserInterface } from './../../../interfaces/AuthUserInterface';
 import { ResolverContextInterface } from './../../../interfaces/ResolverContextInterface';
 import { GraphQLResolveInfo } from 'graphql';
 import { Transaction } from 'sequelize';
@@ -31,7 +32,7 @@ export const userResolvers = {
         /**
          * Retorna todos os usuarios
          */
-        users: compose(authResolver, verifyTokenResolver)((user: UserInstance, { first = 10, offset = 0}: GenericInterface, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
+        users: compose(authResolver, verifyTokenResolver)((_user: UserInstance, { first = 10, offset = 0}: GenericInterface, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
             return db.User.findAll({
                     limit: first,
                     offset: offset,
@@ -39,7 +40,7 @@ export const userResolvers = {
                 }
             ).catch(handlerError);
         }),
-        user: (user: UserInstance, {id}: GenericInterface, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
+        user: (_user: UserInstance, {id}: GenericInterface, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
             return db.User.findById(Number(id), {
                     attributes: requestedFields.getFields(info, {keep: ['id'], exclude: ['post']})
                 }).then((user: UserInstance | any) => {
@@ -48,22 +49,26 @@ export const userResolvers = {
              }).catch(handlerError);
         
         },
-        currentUser: compose(...authResolvers)((user: UserInstance, args: any, {authUser}: {authUser: AuthUser}, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
-            return db.User.findById(authUser.id, {
-                    attributes: requestedFields.getFields(info, {keep: ['id'], exclude: ['post']})
-                }).then((user: UserInstance | any) => {
-                    throwErro(!user, `User with: ${authUser.id} Not Found`);
-                    return user;
-            }).catch(handlerError);
+        currentUser: compose(...authResolvers)(async (_user: UserInstance, _args: any, {authUser}: {authUser: AuthUserInterface}, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
+            try {
+                const user = await db.User.findById(authUser.id, {
+                    attributes: requestedFields.getFields(info, { keep: ['id'], exclude: ['post'] })
+                });
+                throwErro(!user, `User with: ${authUser.id} Not Found`);
+                return user;
+            }
+            catch (handlerError) {
+                return handlerError(handlerError);
+            }
         })
     },
     Mutation: {
-        createUser: (user: UserInstance, args: GenericInterface,  info: GraphQLResolveInfo) => {
+        createUser: (_user: UserInstance, args: GenericInterface,  _info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User.create(args.input, {transaction: t});
             }).catch(handlerError);
         },
-        updateUser: (user: UserInstance, {id, input}: GenericInterface, info: GraphQLResolveInfo) => {
+        updateUser: (_user: UserInstance, {id, input}: GenericInterface, _info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User.findById(Number(id))
                     .then((user: UserInstance | any) => {
@@ -72,7 +77,7 @@ export const userResolvers = {
                 });
             }).catch(handlerError);
         },
-        updateUserPassword: (user: UserInstance, {id, input}: GenericInterface, info: GraphQLResolveInfo) => {
+        updateUserPassword: (_user: UserInstance, {id, input}: GenericInterface, _info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User.findById(Number(id)).then((user: UserInstance | any) => {
                     if (!user) {
@@ -83,7 +88,7 @@ export const userResolvers = {
                 });
             }).catch(handlerError);
         },
-        deleteUser: (user: UserInstance, {id}: GenericInterface,  info: GraphQLResolveInfo) => {
+        deleteUser: (_user: UserInstance, {id}: GenericInterface,  _info: GraphQLResolveInfo) => {
             return db.sequelize.transaction((t: Transaction) => {
                 return db.User.findById(Number(id))
                     .then((user: UserInstance | null) => {

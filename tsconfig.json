@@ -6,7 +6,7 @@
       "target": "es6",
       "module": "commonjs",
       "sourceMap": false,
-      "outDir": "dist"  
+      "outDir": "dist"
   },
   "compileOnSave": false,
   "include": [
