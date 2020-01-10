@@ -1,8 +1,13 @@
+import { JWT_SECRET } from './../../../src/utils/utils';
+import * as jwt from 'jsonwebtoken';
+
 import { UserInstance } from './../../../src/models/UserModel';
 import { db, app, handlerError, expect } from './../../teste-utils';
 
 describe('User', () => {
     let userId: number;
+    let token: string;
+
     beforeEach(() => {
         return db.Comment.destroy({where: {}}) // limpando tabela de Commentes
             .then((rows: number) => db.Post.destroy({where: {}})) // limpando tabela de Commentes
@@ -20,7 +25,9 @@ describe('User', () => {
                 }
             ])).then((users: Array<UserInstance>) => {
                 userId = users[0].get('id');
-                return userId;
+                const payload = {sub: userId};
+
+                token = jwt.sign(payload, JWT_SECRET);
             });
     });
 
@@ -157,7 +164,7 @@ describe('User', () => {
                 it('should return an error if User not exists', () => {
                     const body = {
                         query: `
-                            query getSingleUser($id: ID!) {
+                            query getSingleUser($id: ID!) { 
                                 user(id: $id) {
                                    name
                                    email
@@ -179,7 +186,7 @@ describe('User', () => {
                             expect(res.body.errors).to.be.an('array');
                             expect(res.body).to.have.keys(['data', 'errors']);
                             expect(res.body.errros[0].message).to.equal('ERROR: User with id -1 Not Found');
-                            
+
                         }).catch(handlerError);
                 });
 
@@ -187,4 +194,162 @@ describe('User', () => {
 
         });
     });
+
+    describe('Mutations', () => {
+        describe('application/json', () => {
+            describe('createUser', () => {
+                it('should create new User', () => {
+                    const body = {
+                        query: `
+                            mutation createNewUser($input: UserCreateInput!) {
+                                createUser(input: $input) {
+                                    id
+                                    name
+                                    email
+                                }
+                            }
+                        `,
+                        variables: {
+                            input: {
+                                name: 'Drax',
+                                email: 'drax@guardians.com',
+                                password: '4321'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            const createdUser = res.body.data.createUser
+
+                            expect(createdUser).to.be.an('object')
+                            expect(createdUser).to.equal('Drax')
+                            expect(createdUser.name).to.equal('drax@guardians.com')
+                            expect(Number(createdUser.id)).to.be.an('number')
+                        }).catch(handlerError);
+                });
+            });
+
+            describe('updateUser', () => {
+                it('should update a existing User', () => {
+                    const body = {
+                        query: `
+                            mutation updateExistingUser($input: UserUpdateInput!) {
+                                updateUser(input: $input) {
+                                    name
+                                    email
+                                    photo
+                                }
+                            }
+                        `,
+                        variables: {
+                            input: {
+                                name: 'Star Lord',
+                                email: 'peter@guardians.com',
+                                photo: 'some_photo'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            const updateUser = res.body.data.updateUser;
+
+                            expect(updateUser).to.be.an('object');
+                            expect(updateUser.name).to.equal('Star Lord')
+                            expect(updateUser.email).to.equal('peter@guardians.com')
+                            expect(updateUser.photo).to.not.be.null;
+                            expect(updateUser.id).to.be.undefined;
+                        }).catch(handlerError);
+                });
+
+                it('should block operation if token a existing invalid', () => {
+                    const body = {
+                        query: `
+                            mutation updateExistingUser($input: UserUpdateInput!) {
+                                updateUser(input: $input) {
+                                    name
+                                    email
+                                    photo
+                                }
+                            }
+                        `,
+                        variables: {
+                            input: {
+                                name: 'Star Lord',
+                                email: 'peter@guardians.com',
+                                photo: 'some_photo'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer INVALID_TOKEN`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            expect(res.body.data.updateUser).to.be.null;
+                            expect(res.body).to.have.keys(['data', 'errors']);
+                            expect(res.body.errors).to.be.an('array');
+                            expect(res.body.errors[0].message).to.equal('JsonWebTokenError: jwt malformed');
+                        }).catch(handlerError);
+                });
+
+            });
+
+            describe('updateUserPassword', () => {
+                it('should update the password of an existing User', () => {
+                    const body = {
+                        query: `
+                            mutation updateUserPassword($input: UserUpdatePasswordInput!) {
+                                updateUserPassword(input: $input)
+                            }
+                        `,
+                        variables: {
+                            input: {
+                                password: 'theguardianofgalaxy'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            expect(res.body.data.updateUserPassword).to.be.true;
+                        }).catch(handlerError);
+                });
+
+            });
+
+            describe('deleteUser', () => {
+                it('should delete an existing User', () => {
+                    const body = {
+                        query: `mutation deleteUser`
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            expect(res.body.data.deleteUser).to.be.true;
+                        }).catch(handlerError);
+                });
+
+            });
+        });
+    });
+
 });
