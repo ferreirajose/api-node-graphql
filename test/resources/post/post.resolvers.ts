@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 
-import { JWT_SECRET, handlerError } from './../../../src/utils/utils';
+import { JWT_SECRET } from './../../../src/utils/utils';
 import { db, app, handlerError, expect } from './../../teste-utils';
 
 import { UserInstance } from './../../../src/models/UserModel';
@@ -193,5 +193,121 @@ describe('Post', () => {
             });
         });
 
+    });
+
+    describe('Mutation', () => {
+        describe('application/json', () => {
+            describe('createPost', () => {
+                it('Should create a new Post', () => {
+                    let body = {
+                        query: `
+                            mutation createNewPost($input: PostInput!) {
+                                createPost(input: $input) {
+                                    id
+                                    title
+                                    content
+                                    author {
+                                        name
+                                        email
+                                    }
+                                }
+                            }
+                        `,
+                        variables: {
+                            input: {
+                                title: 'Fourth Post',
+                                content: 'Fourth content',
+                                photo: 'some_photo'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+
+                            const createPost = res.body.data.createPost;
+                            
+                            expect(createPost).to.be.an('object');
+                            expect(createPost).to.have.keys(['id', 'title', 'content', 'author']);
+                            expect(createPost.title).to.equal('Fourth Post');
+                            expect(createPost.content).to.equal('Fourth content');
+                            expect(Number(createPost.author.id)).to.equal(userId);
+                            
+                        }).catch(handlerError);
+                });
+            }); 
+
+            describe('updatePost', () => {
+                it('Should update an existing Post', () => {
+                    let body = {
+                        query: `
+                            mutation updateExistingPost($id: ID!, $input: PostInput!) {
+                                updatePost(id: $id, input: $input) {
+                                    title
+                                    content
+                                    photo
+                                }
+                            }
+                        `,
+                        variables: {
+                            id: postId,
+                            input: {
+                                title: 'Post changed',
+                                content: 'Content changed',
+                                photo: 'some_photo_2'
+                            }
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+
+                            const updatePost = res.body.data.updatePost;
+                            
+                            expect(updatePost).to.be.an('object');
+                            expect(updatePost).to.have.keys(['id', 'title', 'content', 'photo']);
+                            expect(updatePost.title).to.equal('Post changed');
+                            expect(updatePost.content).to.equal('Content changed');
+                            expect(updatePost.photo).to.equal('some_photo_2');
+                            
+                        }).catch(handlerError);
+                });
+            }); 
+
+            describe('deletePost', () => {
+                it('Should delet an existing Post', () => {
+                    let body = {
+                        query: `
+                            mutation deleteExistingPost($id: ID!) {
+                                deletePost(id: $id) 
+                            }
+                        `,
+                        variables: {
+                            id: postId
+                        }
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            
+                            expect(res.body.data).to.have.key('deletePost');
+                            expect(res.body.data.deletePost).to.be.true;
+
+                        }).catch(handlerError);
+                });
+            }); 
+        });
     });
 });
