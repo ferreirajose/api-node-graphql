@@ -1,3 +1,4 @@
+import { AuthUserInterface } from './../../../interfaces/AuthUserInterface';
 import { ResolverContextInterface } from './../../../interfaces/ResolverContextInterface';
 import { GraphQLResolveInfo } from 'graphql';
 import { Transaction } from 'sequelize';
@@ -35,8 +36,7 @@ export const userResolvers = {
             return db.User.findAll({
                     limit: first,
                     offset: offset,
-                    attributes: requestedFields.
-                    (info, {keep: ['id'], exclude: ['post']})
+                    attributes: requestedFields.getFields(info, {keep: ['id'], exclude: ['post']})
                 }
             ).catch(handlerError);
         }),
@@ -49,7 +49,7 @@ export const userResolvers = {
              }).catch(handlerError);
         
         },
-        currentUser: compose(...authResolvers)((user: UserInstance, args: any, {authUser}: {authUser: AuthUser}, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
+        currentUser: compose(...authResolvers)((user: UserInstance, args: any, {authUser}: {authUser: AuthUserInterface}, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
             return db.User.findById(authUser.id, {
                     attributes: requestedFields.getFields(info, {keep: ['id'], exclude: ['post']})
                 }).then((user: UserInstance | any) => {
