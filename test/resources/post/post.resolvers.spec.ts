@@ -1,10 +1,10 @@
 import * as jwt from 'jsonwebtoken';
 
-import { JWT_SECRET } from './../../../src/utils/utils';
-import { db, app, handlerError, expect } from './../../teste-utils';
+import { JWT_SECRET } from '../../../src/utils/utils';
+import { db, app, handlerError, expect } from '../../teste-utils';
 
-import { UserInstance } from './../../../src/models/UserModel';
-import { PostInstance } from './../../../src/models/PostModel';
+import { UserInstance } from '../../../src/models/UserModel';
+import { PostInstance } from '../../../src/models/PostModel';
 
 describe('Post', () => {
     let userId: number;

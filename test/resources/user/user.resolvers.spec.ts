@@ -1,8 +1,8 @@
-import { JWT_SECRET } from './../../../src/utils/utils';
+import { JWT_SECRET } from '../../../src/utils/utils';
 import * as jwt from 'jsonwebtoken';
 
-import { UserInstance } from './../../../src/models/UserModel';
-import { db, app, handlerError, expect } from './../../teste-utils';
+import { UserInstance } from '../../../src/models/UserModel';
+import { db, app, handlerError, expect } from '../../teste-utils';
 
 describe('User', () => {
     let userId: number;
@@ -192,6 +192,35 @@ describe('User', () => {
 
             });
 
+            describe('currentUser', () => {
+                it('should return the User owner of the token', () => {
+                    const body = {
+                        query: `
+                            query { 
+                                currentUser {
+                                   name
+                                   email
+                                }
+                            }
+                        `
+                    }
+
+                    return chai.request(app)
+                        .post('/grapqhl')
+                        .set('content-type', 'application/json')
+                        .set('authorization', `Bearer ${token}`)
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            const currentUser = res.body.data.currentUser;
+
+                            expect(currentUser).to.be.an('object');
+                            expect(currentUser).to.have.keys(['name', 'email']);
+                            expect(currentUser.name).to.equal('Peter Quill');
+                            expect(currentUser.email).to.equal('peter@guardians.com');
+                            
+                        }).catch(handlerError);
+                });
+            });
         });
     });
 
@@ -345,6 +374,21 @@ describe('User', () => {
                         .send(JSON.stringify(body))
                         .then(res => {
                             expect(res.body.data.deleteUser).to.be.true;
+                        }).catch(handlerError);
+                });
+
+
+                it('should block operation if token is not provided', () => {
+                    const body = {
+                        query: `mutation deleteUser`
+                    };
+
+                    return chai.request(app)
+                        .post('/graphql')
+                        .set('content-type', 'application/json')
+                        .send(JSON.stringify(body))
+                        .then(res => {
+                            expect(res.body.erros[0].message).to.equal('Unauthorized! Token not Provided!');
                         }).catch(handlerError);
                 });
 

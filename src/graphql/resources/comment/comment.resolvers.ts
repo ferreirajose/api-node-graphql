@@ -10,6 +10,7 @@ import { handlerError } from '../../../utils/utils';
 import { CommentInstance } from '../../../models/CommentModel';
 import { DbConnectionInterface } from '../../../interfaces/DbConnectionInterface';
 import { GenericInterface } from '../../../interfaces/GenericInterface';
+import { compose } from '../../composable/composable.resolver';
 
 export const commentResolvers = {
     Comment: {
@@ -29,14 +30,14 @@ export const commentResolvers = {
         }
     },
     Query: {
-        commentsByPost: (comment: CommentInstance, {id, first = 10, offset = 0}: GenericInterface, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
+        commentsByPost: compose()((comment: CommentInstance, {id, first = 10, offset = 0}: GenericInterface, {requestedFields}: {requestedFields: RequestedFields}, info: GraphQLResolveInfo) => {
             return db.Comment.findAll({
                 where: { post: id},
                 limit: first,
                 offset: offset,
-                attributes: requestedFields.getFields(info)
+                attributes: requestedFields.getFields(info, {keep: undefined})
             }).catch(handlerError);
-        }
+        })
     },
     Mutation: {
         createComment: (comment: CommentInstance, {input}: GenericInterface, info: GraphQLResolveInfo) => {

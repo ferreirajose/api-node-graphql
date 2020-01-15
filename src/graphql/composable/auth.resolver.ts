@@ -7,7 +7,7 @@ import { verifyTokenResolver } from './verify-token.resolver';
 
 export const authResolver: ComposableResolver<any, ResolverContextInterface> = 
     (resolver: GraphQLFieldResolver<any, ResolverContextInterface>): GraphQLFieldResolver<any, ResolverContextInterface> => {
-        return (parent, args, context, info) => {
+        return (parent, args, context: ResolverContextInterface, info) => {
             if (context.authUser || context.authorization) {
                 return resolver(parent, args, context, info);
             }      
